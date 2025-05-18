@@ -1,0 +1,153 @@
+-- Creamos la DB pedida por el cliente
+CREATE DATABASE InstEduc;
+-- Usamos la DB creada
+USE InstEduc2025;
+-- Creamos las tablas
+-- Tabla de Administración con sus atributos
+CREATE TABLE Administracion (
+id INT PRIMARY KEY,
+Nombre VARCHAR (25),
+Apellido VARCHAR (25),
+Email VARCHAR (25) NOT NULL
+);
+-- Si queremos que el mail incluya caracteres especiales y no se repitan los mails: 
+-- CONSTRAINT chk_email CHECK (email REGEXP '^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$')--> en este caso no es necesario
+-- Tabla de Personal Administrativo
+CREATE TABLE PersonalAdministrativo (
+idPersonalAdministrativo INT PRIMARY KEY AUTO_INCREMENT,
+Nombre VARCHAR (25),
+Apellido VARCHAR (25),
+Email VARCHAR (25) NOT NULL 
+CONSTRAINT chk_email CHECK (email REGEXP '^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$'),
+Telefono VARCHAR (25)
+);
+
+-- Aclaración El número de teléfono, puede comenzar con el + ó con 0 y no lo necesitamos para hacer cálculos, 
+-- por lo que es preferible que el sistema lo tome como varchar
+
+-- Tabla de Institución Educativa
+CREATE TABLE InstitucionEducativa (
+idInstitucionEducativa INT PRIMARY KEY,
+Nombre VARCHAR (25),
+Dirección VARCHAR (75)
+);
+
+-- Tabla de Padre o Tutor
+CREATE TABLE PadreTutor (
+idPadreTutor INT PRIMARY KEY AUTO_INCREMENT,
+Nombre VARCHAR (25),
+Apellido VARCHAR (25),
+Dirección VARCHAR (75),
+Teléfono VARCHAR (25),
+FormaPago VARCHAR (25),
+CondicionPermanencia ENUM ('Activo', 'Completado', 'Cesante') NOT NULL
+);
+
+-- Tabla de Alumnos
+CREATE TABLE Alumnos (
+idAlumnos INT PRIMARY KEY AUTO_INCREMENT,
+Nombre VARCHAR (25),
+Apellido VARCHAR (25),
+Dirección VARCHAR (75),
+Teléfono VARCHAR (25),
+Email VARCHAR (25),
+Año INT,
+idInstitucionEducariva INT (25),
+idPadreTutor INT,
+FOREIGN KEY (idPadreTutor) REFERENCES PadreTutor (idPadreTutor)
+);
+
+-- Tabla Docente
+CREATE TABLE Docente (
+idDocente INT PRIMARY KEY AUTO_INCREMENT,
+Nombre VARCHAR (25),
+Apellido VARCHAR (25),
+Dirección VARCHAR (75),
+Teléfono VARCHAR (25),
+Email VARCHAR (25),
+CUIL VARCHAR (11),
+AreaIncumbencia VARCHAR (50),
+HorarioDisponible VARCHAR (50),
+UltimoPago DATE
+);
+
+-- Tabla Clase
+CREATE TABLE Clase (
+idClase INT PRIMARY KEY AUTO_INCREMENT,
+Tipo ENUM ('Presencial', 'Virtual', 'Híbrida'),
+Materia VARCHAR (50), 
+Fecha DATE,
+HoraInicio TIME,
+HoraFin TIME, 
+idDocente INT,
+idAdministrativo INT,
+FOREIGN KEY (idDocente) REFERENCES Docente (idDocente),
+FOREIGN KEY (idAdministrativo) REFERENCES PersonalAdministrativo (idPersonalAdministrativo)
+);
+SHOW TABLES;
+SHOW ERRORS;
+SELECT DATABASE();
+DESCRIBE Clase;
+ALTER TABLE Clase
+ADD COLUMN idDocente INT,
+ADD COLUMN idAdministrativo INT,
+ADD CONSTRAINT fkDocente FOREIGN KEY (idDocente) REFERENCES Docente(idDocente),
+ADD CONSTRAINT fkAdministrativo FOREIGN KEY (idAdministrativo) REFERENCES PersonalAdministrativo(idPersonalAdministativo);
+
+ALTER TABLE Clase
+ADD CONSTRAINT fkDocente FOREIGN KEY (idDocente) REFERENCES Docente(idDocente),
+ADD CONSTRAINT fkAdministrativo FOREIGN KEY (idAdministrativo) REFERENCES PersonalAdministrativo(idPersonalAdministativo);
+
+DESCRIBE Clase;
+ALTER TABLE Clase
+ADD COLUMN idAdministrativo INT;
+ALTER TABLE Clase
+ADD CONSTRAINT fkAdministrativo FOREIGN KEY (idAdministrativo) REFERENCES PersonalAdministrativo(idPersonalAdministrativo);
+
+-- Creamos la Tabla de la Clase por alumno
+CREATE TABLE ClaseAlumno(
+idClaseAlumno INT PRIMARY KEY AUTO_INCREMENT,
+idClase INT,
+idAlumnos INT,
+MaterialEntregado BOOLEAN,
+Observaciones TEXT,
+FOREIGN KEY (idClase) REFERENCES Clase(idClase),
+FOREIGN KEY (idAlumnos) REFERENCES Alumnos (idAlumnos)
+);
+
+DESCRIBE Clase;
+DESCRIBE Alumno;
+
+-- Creamos la Tabla de Asistencia
+CREATE TABLE Asistencia (
+idAsistencia INT PRIMARY KEY AUTO_INCREMENT,
+idClase INT,
+idAlumnos INT,
+Presente BOOLEAN,
+Fecha DATE,
+FOREIGN KEY (idClase) REFERENCES Clase(idClase),
+FOREIGN KEY (idAlumnos) REFERENCES Alumnos(idAlumnos)
+);
+
+-- Creemos la Tabla de Pagos de Alumnos
+CREATE TABLE PagoAlumno (
+id INT PRIMARY KEY AUTO_INCREMENT,
+idPadreTutor INT,
+Fecha DATE,
+Total DECIMAL(10,2),
+Forma_pago VARCHAR(50),
+Pago_adelantado BOOLEAN,
+Detalle TEXT,
+FOREIGN KEY (idPadreTutor) REFERENCES PadreTutor(idPadreTutor)
+);
+
+-- Creamos la Tabla de Pago al docente por las horas de clase
+CREATE TABLE PagoDocente (
+idPagoDocente INT PRIMARY KEY AUTO_INCREMENT,
+idDocente INT,
+Fecha DATE,
+Cantidad_horas INT,
+Total DECIMAL(10,2),
+Detalle TEXT,
+FOREIGN KEY (idDocente) REFERENCES Docente(idDocente)
+);
