@@ -91,12 +91,12 @@ void tres()
 
 void cuatro()
 {
-    int i=1;
+    int i = 1;
     float primer = 0.0, n = 0.0;
     cout << "Ingrese un numero: " << endl;
     cin >> primer;
 
-    while (i<10)
+    while (i < 10)
     {
         cout << "Ingrese un numero: " << endl;
         cin >> n;
@@ -104,24 +104,54 @@ void cuatro()
         {
             break;
         }
-        if (i==9)
+        if (i == 9)
         {
             cout << "No se ha ingresado el doble de X" << endl;
         }
-        
+
         i++;
     }
 }
 
-cinco(){
-    
+void cinco()
+{
+    int lp = 0, sumAlumnos = 0, sumAprobados = 0, sumDestacados;
+    float promedio, porcentajeDestacados;
+
+    while (true)
+    {
+        cout << "Ingresé un legajo: ";
+        cin >> lp;
+        if (lp == -1)
+        {
+            break;
+        }
+        cout << "Ingresé el promedio: ";
+        cin >> promedio;
+        if (promedio > 6.5)
+        {
+            sumAprobados++;
+        }
+        if (promedio > 8.5 && lp < 2500)
+        {
+            sumDestacados;
+        }
+
+        sumAlumnos++;
+    }
+    cout << "Porcentaje de alumnos destacados: " << (sumDestacados * 100) / sumAlumnos << endl;
+    cout << "Cantidad de alumnos ingresados: " << sumAlumnos << endl;
+    cout << "Cantidad de alumnos con promedio mayor 6.5: " << sumAprobados << endl;
+    cout << "Final del programa" << endl;
+
 }
 
 int main()
 {
     // uno();
     // dos();
-    //tres();
-    //cuatro();
+    // tres();
+    // cuatro();
+    cinco();
     return 0;
 }
